@@ -95,8 +95,7 @@ class LogStash::Outputs::MQTT < LogStash::Outputs::Base
   public
   def register
     @options = {
-      :host => @host,
-      :topic => @topic
+      :host => @host
     }
     if @port
       @options[:port] = @port

@@ -5,40 +5,39 @@ require "logstash/codecs/json"
 require "logstash/event"
 
 describe LogStash::Outputs::MQTT do
-  let(:sample_event) { LogStash::Event.new }
+  # Define a sample event and its JSON encoded form
+  let(:sample_event) { LogStash::Event.new("message" => "test message", "@timestamp" => "2016-01-01") }
+  encoded_event = "{\"message\":\"test message\",\"@timestamp\":\"2016-01-01T00:00:00.000Z\",\"@version\":\"1\"}"
+
   settings = {
     "host" => "test.mosquitto.org",
     "topic" => "hello"
   }
   let(:output) { LogStash::Outputs::MQTT.new(settings) }
+  let(:stub_client) { Object.new }
 
   before do
     output.register
-#    def stubClient.publish()
-#      puts "abcd3"
-#    end
   end
 
   describe "receive message" do
 
-    it "does not crash" do
-      puts "0"
+    it "connects and publishes with correct arguments" do
 
-      stubClient = Object.new
       expect(MQTT::Client).to receive(:connect).with(
         :host => "test.mosquitto.org",
-        :topic => "hello",
         :port => 8883
-      )
-# {
-#        return stubClient
-#      }
-#      expect(stubClient).to receive(:publish2)
+      ) do |*args, &block|
+        block.call(stub_client)
+      end
 
-      puts "1"
+     expect(stub_client).to receive(:publish).with(
+       :topic => "hello",
+       :payload => encoded_event,
+       :retain => false,
+       :qos => 0)
+
       output.receive(sample_event)
-      puts "testing"
-      # expect(subject).to eq(nil)
     end
   end
 end
