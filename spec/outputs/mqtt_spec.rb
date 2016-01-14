@@ -31,13 +31,26 @@ describe LogStash::Outputs::MQTT do
         block.call(stub_client)
       end
 
-     expect(stub_client).to receive(:publish).with(
-       :topic => "hello",
-       :payload => encoded_event,
-       :retain => false,
-       :qos => 0)
+      expect(stub_client).to receive(:publish).with("hello", encoded_event, false, 0)
 
       output.receive(sample_event)
+    end
+  end
+
+  describe "multi_receive" do
+    it "connects once and publishes all messages" do
+
+      expect(MQTT::Client).to receive(:connect).once.with(
+        :host => "test.mosquitto.org",
+        :port => 8883
+      ) do |*args, &block|
+        block.call(stub_client)
+      end
+
+      expect(stub_client).to receive(:publish).exactly(3).times.with("hello", encoded_event, false, 0)
+
+      three_events = [sample_event, sample_event, sample_event]
+      output.multi_receive(three_events)
     end
   end
 end
