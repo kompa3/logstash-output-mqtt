@@ -128,7 +128,7 @@ class LogStash::Outputs::MQTT < LogStash::Outputs::Base
     # Use an array as a buffer so the multi_receive can handle multiple events with a single connection
     @event_buffer = Array.new
     @codec.on_event do |event, encoded_event|
-      @event_buffer.push(encoded_event)
+      @event_buffer.push([event, encoded_event])
     end
 
   end # def register
@@ -162,9 +162,9 @@ class LogStash::Outputs::MQTT < LogStash::Outputs::Base
     # This way it is easy to cope with network failures, ie. if connection fails just try it again
     @logger.debug("Connecting MQTT with options #{@options}")
     MQTT::Client.connect(@options) do |client|
-      while encoded_event = @event_buffer.first do
-        @logger.debug("Publishing MQTT event #{encoded_event} with topic #{@topic}, retain #{@retain}, qos #{@qos}")
-        client.publish(@topic, encoded_event, @retain, @qos)
+      while event = @event_buffer.first do
+        @logger.debug("Publishing MQTT event #{event[1]} with topic #{@topic}, retain #{@retain}, qos #{@qos}")
+        client.publish(event[0].sprintf(@topic), event[1], @retain, @qos)
         @event_buffer.shift
       end
     end
