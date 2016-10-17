@@ -3,7 +3,7 @@ set -ex
 
 # This script builds the plugin in correct JRuby environment using dockerized build environment
 
-if [ ! -f /.dockerinit ]; then
+if [ ! -f /.dockerenv ]; then
   echo "Launching build script inside dockerized build environment ..."
 
   # Check if docker is installed in the system
@@ -36,7 +36,19 @@ else
   # Fix file ownership because docker environment only has root user
   chown "$HOST_USER_ID"."$HOST_USER_ID" *.gem
 
+  set +x
   echo "Built successfully"
+  echo "If do not want to publish a new version of the gem just yet, type exit"
+  echo "To continue with publishing the gem, check that the version of gemspec file is correct and do the following:"
+  echo "   curl -u username:password https://rubygems.org/api/v1/api_key.yaml > ~/.gem/credentials"
+  echo "   chmod 0600 ~/.gem/credentials"
+  echo "   apt-get update && apt-get install git"
+  echo "   bundle exec rake vendor"
+  echo "   bundle exec rake publish_gem"
+
+  # Allow the user to publish the gem
+  /bin/bash
+
   echo "To register the plugin in your current logstash installation, run:"
   echo "  sudo /opt/logstash/bin/plugin install logstash-output-mqtt-*.gem"
 fi

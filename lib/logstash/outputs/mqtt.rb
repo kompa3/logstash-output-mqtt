@@ -43,8 +43,16 @@ require "mqtt"
 # }
 # ----------------------------------
 #
-# Note that you will obtain the above configuration items when connecting a device in AWS IoT service.
-# The root CA certificate is also available from Symantec https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem[here].
+# Topic may also depend on parts of the event using the standard sprintf syntax.
+# [source,ruby]
+# ----------------------------------
+# output {
+#   mqtt {
+#     ...
+#     topic => "something/%{myfield}"
+#   }
+# }
+# ----------------------------------
 
 class LogStash::Outputs::MQTT < LogStash::Outputs::Base
 
