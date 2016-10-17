@@ -3,11 +3,15 @@ require "logstash/devutils/rspec/spec_helper"
 require "logstash/outputs/mqtt"
 require "logstash/codecs/json"
 require "logstash/event"
+require "time"
 
 describe LogStash::Outputs::MQTT do
   # Define a sample event and its JSON encoded form
-  let(:sample_event) { LogStash::Event.new("message" => "test message", "@timestamp" => "2016-01-01") }
-  encoded_event = "{\"message\":\"test message\",\"@timestamp\":\"2016-01-01T00:00:00.000Z\",\"@version\":\"1\"}"
+  datestring = "2016-01-01"
+  tstamp = Time.parse(datestring)
+  tstamp_utc = tstamp.utc.iso8601(3)
+  let(:sample_event) { LogStash::Event.new("message" => "test message", "@timestamp" => datestring) }
+  encoded_event = "{\"message\":\"test message\",\"@timestamp\":\"" + tstamp_utc + "\",\"@version\":\"1\"}"
 
   settings = {
     "host" => "test.mosquitto.org",
