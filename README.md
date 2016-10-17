@@ -2,7 +2,7 @@
 
 This is a plugin for [Logstash](https://github.com/elastic/logstash).
 
-This plugin has been published to rubygems.org, https://rubygems.org/gems/logstash-output-mqtt/.
+This plugin has been published to rubygems.org as [logstash-output-mqtt](https://rubygems.org/gems/logstash-output-mqtt/) gem.
 
 ## Installation to Logstash
 
@@ -15,7 +15,7 @@ sudo /opt/logstash/bin/plugin install logstash-output-mqtt
 
 ## Usage
 
-See [lib/logstash/outputs/mqtt.rb](mqtt.rb) file for plugin usage.
+See [mqtt.rb](lib/logstash/outputs/mqtt.rb) file for plugin usage.
 
 ## License
 
