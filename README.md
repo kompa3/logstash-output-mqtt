@@ -8,7 +8,10 @@ This plugin has been published to rubygems.org, https://rubygems.org/gems/logsta
 
 In Logstash home directory: bin/logstash-plugin install logstash-output-mqtt
 
-Ubuntu: sudo /opt/logstash/bin/plugin install logstash-output-mqtt
+Ubuntu:
+```
+sudo /opt/logstash/bin/plugin install logstash-output-mqtt
+```
 
 ## Usage
 
