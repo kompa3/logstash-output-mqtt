@@ -6,7 +6,7 @@ This plugin has been published to rubygems.org as [logstash-output-mqtt](https:/
 
 ## Installation to Logstash
 
-In Logstash home directory: bin/logstash-plugin install logstash-output-mqtt
+In Logstash home directory: `bin/logstash-plugin install logstash-output-mqtt`
 
 Ubuntu:
 ```
