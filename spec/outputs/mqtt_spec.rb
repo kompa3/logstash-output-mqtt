@@ -11,7 +11,7 @@ describe LogStash::Outputs::MQTT do
   tstamp = Time.parse(datestring)
   tstamp_utc = tstamp.utc.iso8601(3)
   let(:sample_event) { LogStash::Event.new("message" => "test message", "@timestamp" => datestring) }
-  encoded_event = "{\"message\":\"test message\",\"@timestamp\":\"" + tstamp_utc + "\",\"@version\":\"1\"}"
+  encoded_event = "{\"@timestamp\":\"" + tstamp_utc + "\",\"@version\":\"1\",\"message\":\"test message\"}"
 
   settings = {
     "host" => "test.mosquitto.org",
@@ -65,7 +65,7 @@ describe "Test subtopic:" do
   tstamp = Time.parse(datestring)
   tstamp_utc = tstamp.utc.iso8601(3)
   let(:sample_event) { LogStash::Event.new("message" => "test message", "@timestamp" => datestring, "subtopic" => "mysubtopic") }
-  encoded_event = "{\"message\":\"test message\",\"@timestamp\":\"" + tstamp_utc + "\",\"subtopic\":\"mysubtopic\",\"@version\":\"1\"}"
+  encoded_event = "{\"@timestamp\":\"" + tstamp_utc + "\",\"@version\":\"1\",\"message\":\"test message\",\"subtopic\":\"mysubtopic\"}"
 
   settings = {
     "host" => "test.mosquitto.org",
