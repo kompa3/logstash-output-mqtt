@@ -15,8 +15,10 @@ if [ ! -f /.dockerenv ]; then
   # Execute the build script in jruby docker container
   USER_ID=$(id -u)
   DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  HOME_DIR="$( cd ~/ && pwd )"
   docker run --rm $([ -t 0 ] && echo "-ti") \
     -v "$DIR":"$DIR" \
+    -v "$HOME_DIR/.ssh":"/root/.ssh" \
     -w="$DIR" \
     -e "HOST_USER_ID=$USER_ID" \
     jruby:latest "$DIR/build.sh"
@@ -42,7 +44,7 @@ else
   echo "To continue with publishing the gem, check that the version of gemspec file is correct and do the following:"
   echo "   curl -u username:password https://rubygems.org/api/v1/api_key.yaml > ~/.gem/credentials"
   echo "   chmod 0600 ~/.gem/credentials"
-  echo "   apt-get update && apt-get install git"
+  echo "   apt-get update && apt-get install -y git"
   echo "   bundle exec rake vendor"
   echo "   bundle exec rake publish_gem"
 
