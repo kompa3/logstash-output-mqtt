@@ -24,5 +24,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "mqtt"
 
   # 1.3.5 version has some problems, stick to 1.3.4 by now
-  s.add_development_dependency "logstash-devutils", "< 1.3.5"
+  s.add_development_dependency "logstash-devutils", "< 1.3.6"
 end
