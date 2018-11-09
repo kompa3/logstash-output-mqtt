@@ -102,7 +102,6 @@ class LogStash::Outputs::MQTT < LogStash::Outputs::Base
   # Time in seconds to wait before retrying a connection
   config :connect_retry_interval, :validate => :number, :default => 10
 
-  public
   def register
     @options = {
       :host => @host
@@ -138,50 +137,41 @@ class LogStash::Outputs::MQTT < LogStash::Outputs::Base
     @codec.on_event do |event, encoded_event|
       @event_buffer.push([event, encoded_event])
     end
-
   end # def register
 
-  public
   def receive(event)
-
     @codec.encode(event)
     handle_events
   end # def receive
 
-  public
   def multi_receive(events)
-    events.each do |event|
-      @codec.encode(event)
-    end
-
+    events.each { |event| @codec.encode(event) }
     # Handle all events at once to prevent taking a new connection for each event
     handle_events
   end
 
-  public
   def close
-
     @closing = true
   end # def close
 
   private
-  def handle_events
-    # Simple design: connect separately for each event / bunch of events in the buffer
-    # This way it is easy to cope with network failures, ie. if connection fails just try it again
-    @logger.debug("Connecting MQTT with options #{@options}")
-    MQTT::Client.connect(@options) do |client|
-      while event = @event_buffer.first do
-        @logger.debug("Publishing MQTT event #{event[1]} with topic #{@topic}, retain #{@retain}, qos #{@qos}")
-        client.publish(event[0].sprintf(@topic), event[1], @retain, @qos)
-        @event_buffer.shift
-      end
-    end
 
+  def mqtt_client
+    @logger.debug("Connecting MQTT with options #{@options}")
+    @mqtt_client ||= MQTT::Client.connect(@options)
+  end
+
+  def handle_events
+    # It is easy to cope with network failures, ie. if connection fails just try it again
+    while event = @event_buffer.first do
+      @logger.debug("Publishing MQTT event #{event[1]} with topic #{@topic}, retain #{@retain}, qos #{@qos}")
+      mqtt_client.publish(event[0].sprintf(@topic), event[1], @retain, @qos)
+      @event_buffer.shift
+    end
   rescue StandardError => e
     @logger.error("Error #{e.message} while publishing to MQTT server. Will retry in #{@connect_retry_interval} seconds.")
-
+    @mqtt_client = nil
     Stud.stoppable_sleep(@connect_retry_interval, 1) { @closing }
     retry
   end # def handle_event
-
 end # class LogStash::Outputs::MQTT
