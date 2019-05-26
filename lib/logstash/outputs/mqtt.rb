@@ -25,6 +25,19 @@ require "mqtt"
 #   }
 # }
 # ----------------------------------
+
+# Example publishing to test.mosquitto.org field content:
+# [source,ruby]
+# ----------------------------------
+# output {
+#   mqtt {
+#     host => "test.mosquitto.org"
+#     port => 8883
+#     topic => "hello"
+#     message => "Timestamp: %{@timestamp}"
+#   }
+# }
+# ----------------------------------
 #
 # Example publishing to https://aws.amazon.com/iot/[AWS IoT]:
 # [source,ruby]
@@ -69,6 +82,10 @@ class LogStash::Outputs::MQTT < LogStash::Outputs::Base
 
   # Topic that the messages will be published to
   config :topic, :validate => :string, :required => true
+  
+  # Use a field value as message
+  config :message, :validate => :string
+
 
   # Retain flag of the published message
   # If true, the message will be stored by the server and be sent immediately to each subscribing client
@@ -131,11 +148,17 @@ class LogStash::Outputs::MQTT < LogStash::Outputs::Base
       @options[:ca_file] = @ca_file
     end
 
-    # Encode events using the given codec
-    # Use an array as a buffer so the multi_receive can handle multiple events with a single connection
-    @event_buffer = Array.new
-    @codec.on_event do |event, encoded_event|
-      @event_buffer.push([event, encoded_event])
+
+     @event_buffer = Array.new
+     @codec.on_event do |event, encoded_event|
+     if @message
+        if @message != nil   
+           encoded_event = event.sprintf(@message)
+        else
+           encoded_event = ""    
+        end     
+    end
+     @event_buffer.push([event, encoded_event])   
     end
   end # def register
 
