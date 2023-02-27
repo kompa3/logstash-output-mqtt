@@ -102,6 +102,11 @@ class LogStash::Outputs::MQTT < LogStash::Outputs::Base
   # Time in seconds to wait before retrying a connection
   config :connect_retry_interval, :validate => :number, :default => 10
 
+  # Time Keep alive connexion between ping to remote servers
+  config :keep_alive, :validate => :number, :default => 15
+
+
+
   def register
     @options = {
       :host => @host
@@ -129,6 +134,9 @@ class LogStash::Outputs::MQTT < LogStash::Outputs::Base
     end
     if @ca_file
       @options[:ca_file] = @ca_file
+    end
+    if @keep_alive
+      @options[:keep_alive] = @keep_alive
     end
 
     # Encode events using the given codec
