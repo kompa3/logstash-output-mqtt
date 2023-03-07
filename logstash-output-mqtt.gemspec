@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'logstash-output-mqtt'
-  s.version         = "1.2.0"
+  s.version         = "1.2.1"
   s.licenses = ["Apache-2.0"]
   s.summary = "This is Logstash output plugin for the http://mqtt.org/[MQTT] protocol"
   s.description = "This gem is a logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/plugin install gemname. This gem is not a stand-alone program"
@@ -19,10 +19,9 @@ Gem::Specification.new do |s|
   s.metadata = { "logstash_plugin" => "true", "logstash_group" => "output" }
 
   # Gem dependencies
-  s.add_runtime_dependency "logstash-core-plugin-api", "~> 2.0"
+  s.add_runtime_dependency "logstash-core-plugin-api", ">= 1.60", "<= 2.99"
   s.add_runtime_dependency "logstash-codec-json"
   s.add_runtime_dependency "mqtt"
 
-  # 1.3.5 version has some problems, stick to 1.3.4 by now
-  s.add_development_dependency "logstash-devutils", "< 1.3.6"
+  s.add_development_dependency "logstash-devutils"
 end

@@ -3,7 +3,7 @@ set -ex
 
 # This script builds the plugin in correct JRuby environment using dockerized build environment
 
-if [ ! -f /.dockerenv ]; then
+if [ ! "$1" = "true" ]; then
   echo "Launching build script inside dockerized build environment ..."
 
   # Check if docker is installed in the system
@@ -16,15 +16,24 @@ if [ ! -f /.dockerenv ]; then
   USER_ID=$(id -u)
   DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
   HOME_DIR="$( cd ~/ && pwd )"
-  docker run --rm $([ -t 0 ] && echo "-ti") \
+  docker run -ti --rm $([ -t 0 ] && echo "-ti") \
     -v "$DIR":"$DIR" \
-    -v "$HOME_DIR/.ssh":"/root/.ssh" \
+    -v "/home/tommi/.ssh":"/root/.ssh" \
     -w="$DIR" \
     -e "HOST_USER_ID=$USER_ID" \
-    jruby:latest "$DIR/build.sh"
+    -e "LOGSTASH_PATH=/usr/share/logstash" \
+    -e "LOGSTASH_SOURCE=1" \
+    jruby:9.3 "$DIR/build.sh" "true"
 
 else
   echo "Running build commands inside dockerized build environment ..."
+
+  # Install logstash
+  apt-get update
+  apt-get install -y gpg apt-transport-https
+  wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | gpg --dearmor -o /usr/share/keyrings/elastic-keyring.gpg
+  echo "deb [signed-by=/usr/share/keyrings/elastic-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-8.x.list
+  apt-get update && apt-get install logstash
 
   # Install plugin dependencies
   bundle install
